@@ -6,9 +6,16 @@
 
 <h2>Home Page</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+<div>
+    <p style="float:left">
+        @Html.ActionLink("Create New", "Create")
+    </p>
+
+    <p style="float:right">
+        @Html.ActionLink("Export to Excel", "ExportListFromTsv")
+    </p>
+</div>
+
 <table class="table">
     <tr>
         <th>

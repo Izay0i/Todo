@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Todo.DAL;
 using Todo.Models;
 
@@ -27,7 +26,8 @@ namespace Todo.Repository
 
             try
             {
-                items = _context.Items.ToList();
+                var t = from task in _context.Items select task;
+                items = t.OrderBy(i => i.IsComplete).ToList();
             }
             catch (Exception ex)
             {
@@ -45,9 +45,9 @@ namespace Todo.Repository
             {
                 item = _context.Items.SingleOrDefault(x => x.ID == id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("ID doesn't exist");
             }
 
             return item;
@@ -59,9 +59,9 @@ namespace Todo.Repository
             {
                 _context.Items.Add(item);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("Failed to create item");
             }
         }
 
@@ -71,9 +71,9 @@ namespace Todo.Repository
             {
                 _context.Entry(item).State = System.Data.Entity.EntityState.Modified;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("Failed to update item");
             }
         }
 
@@ -88,12 +88,12 @@ namespace Todo.Repository
                 }
                 else
                 {
-                    throw new Exception("Item doesn't exist!");
+                    throw new Exception("Item doesn't exist");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("Failed to delete item");
             }
         }
 

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
-using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using Todo.DAL;
 using Todo.Models;
 using Todo.Repository;
 
@@ -15,6 +14,47 @@ namespace Todo.Controllers
     public class TodoItemController : Controller
     {
         private readonly IRepository<TodoItem> _repo;
+
+        private void _WriteTsv<T>(IEnumerable<T> data, TextWriter output)
+        {
+            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(T));
+            foreach (PropertyDescriptor prop in props)
+            {
+                output.Write(prop.DisplayName);
+                output.Write("\t");
+            }
+
+            output.WriteLine();
+
+            foreach (T item in data)
+            {
+                foreach (PropertyDescriptor prop in props)
+                {
+                    output.Write(prop.Converter.ConvertToString(prop.GetValue(item)));
+                    output.Write("\t");
+                }
+
+                output.WriteLine();
+            }
+        }
+
+        public void ExportListFromTsv()
+        {
+            Response.ClearContent();
+            Response.AddHeader("content-disposition", $"attachment;filename=Exported_Tasks_{DateTime.Now}.xls");
+            Response.AddHeader("Content-Type", "application/vnd.ms-excel");
+
+            var items = from t in _repo.GetAll()
+                        select new
+                        {
+                            Name = t.Name,
+                            Description = t.Description,
+                            IsComplete = t.IsComplete
+                        };
+            
+            _WriteTsv(items, Response.Output);
+            Response.End();
+        }
 
         public TodoItemController(IRepository<TodoItem> repo)
         {

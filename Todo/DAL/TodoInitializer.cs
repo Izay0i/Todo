@@ -13,7 +13,7 @@ namespace Todo.DAL
             var items = new List<TodoItem>
             {
                 new TodoItem { Name = "Test", Description = "Test", },
-                new TodoItem { Name = "Foo", Description = "Bar", },
+                new TodoItem { Name = "Foo", Description = "Bar", IsComplete = true },
             };
             items.ForEach(item => context.Items.Add(item));
             context.SaveChanges();
